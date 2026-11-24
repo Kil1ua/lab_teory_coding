@@ -42,7 +42,7 @@ end_learning_rate = float(params["end_learning_rate"])
 ng_order = int(params.get("ng_order", 4))
 ng_weight = float(params.get("ng_weight", 0.4))
 
-mode = "both"
+mode = "both" #compress, decompress, both
 FREQ_SCALE = 16000000
 SEED = 1234
 
@@ -424,11 +424,18 @@ def main():
             print("Decoding started")
             decompression()
 
+        # Исправил
+        if mode in ("both", "decompress"):
+            hash_dec = md5_file(path_to_decompressed)
+            hash_orig = md5_file(path_to_file)
+            if hash_dec != hash_orig:
+                raise RuntimeError("MD5 mismatch after decompression")
+        """ Ошибка
         hash_dec = md5_file(path_to_decompressed)
         hash_orig = md5_file(path_to_file)
         if hash_dec != hash_orig:
             raise RuntimeError("MD5 mismatch after decompression")
-
+        """
         original_size = os.path.getsize(path_to_file)
         compressed_size = os.path.getsize(path_to_compressed)
         if compressed_size <= 0:
